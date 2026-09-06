@@ -19,6 +19,28 @@ which tests, builds the image, packages the chart, and pushes both to GHCR.
 Do not hand-edit the version in `Chart.yaml` to cut a release — tag instead.
 `Chart.yaml`'s version is a floor, not the authority.
 
+### Every release gets notes
+
+Write them into the annotated tag message *before* pushing the tag — the tag is
+the record, and there is no other place notes are kept.
+
+```sh
+git tag -a v2.3.0 -F - <<'EOF'
+v2.3.0 — <one-line summary>
+
+<what changed, and why it changed>
+
+Upgrade notes:
+- <anything a consumer must do, or "None.">
+EOF
+git push origin v2.3.0
+```
+
+Say what moved and what it fixes. "Bump dependencies" is not a release note —
+name the dependency, the versions, and the reason. If a change alters behaviour
+on upgrade, or requires anything of whoever consumes the chart, that belongs
+under upgrade notes even when the answer is "None."
+
 Nothing here needs the Forgejo API, so no Authorized Integration is required.
 `permissions:` is a GitHub Actions concept that Forgejo ignores — don't add it.
 
