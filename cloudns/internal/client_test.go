@@ -90,6 +90,7 @@ func TestClientFindTxtRecord(t *testing.T) {
 		desc        string
 		authFQDN    string
 		zoneName    string
+		value       string
 		apiResponse []byte
 		expected    result
 	}{
@@ -97,6 +98,7 @@ func TestClientFindTxtRecord(t *testing.T) {
 			desc:     "record found",
 			authFQDN: "_acme-challenge.foo.com.",
 			zoneName: "foo.com",
+			value:    "txtTXTtxtTXTtxtTXTtxtTXT",
 			apiResponse: []byte(`{
   "5769228": {
     "id": "5769228",
@@ -133,8 +135,46 @@ func TestClientFindTxtRecord(t *testing.T) {
 			desc:        "record not found",
 			authFQDN:    "_acme-challenge.foo.com.",
 			zoneName:    "test-zone",
+			value:       "txtTXTtxtTXTtxtTXTtxtTXT",
 			apiResponse: []byte(`[]`),
 			expected:    result{txtRecord: nil},
+		},
+		{
+			desc:     "two records at the same host, matching value returned",
+			authFQDN: "_acme-challenge.foo.com.",
+			zoneName: "foo.com",
+			value:    "secondChallengeValue",
+			apiResponse: []byte(`{
+  "5769228": {
+    "id": "5769228",
+    "type": "TXT",
+    "host": "_acme-challenge",
+    "record": "firstChallengeValue",
+    "failover": "0",
+    "ttl": "60",
+    "status": 1
+  },
+  "5769229": {
+    "id": "5769229",
+    "type": "TXT",
+    "host": "_acme-challenge",
+    "record": "secondChallengeValue",
+    "failover": "0",
+    "ttl": "60",
+    "status": 1
+  }
+}`),
+			expected: result{
+				txtRecord: &TXTRecord{
+					ID:       5769229,
+					Type:     "TXT",
+					Host:     "_acme-challenge",
+					Record:   "secondChallengeValue",
+					Failover: 0,
+					TTL:      60,
+					Status:   1,
+				},
+			},
 		},
 	}
 
@@ -147,7 +187,7 @@ func TestClientFindTxtRecord(t *testing.T) {
 				mockBaseURL, _ := url.Parse(fmt.Sprintf("%s/", server.URL))
 				client.BaseURL = mockBaseURL
 
-				txtRecord, err := client.FindTxtRecord(test.zoneName, test.authFQDN)
+				txtRecord, err := client.FindTxtRecord(test.zoneName, test.authFQDN, test.value)
 
 				if test.expected.error {
 					require.Error(t, err)

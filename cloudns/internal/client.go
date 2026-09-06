@@ -115,8 +115,8 @@ func (c *Client) GetZone(authFQDN string) (*Zone, error) {
 	return nil, fmt.Errorf("zone %s not found for authFQDN %s", authZoneName, authFQDN)
 }
 
-// FindTxtRecord return the TXT record a zone ID and a FQDN
-func (c *Client) FindTxtRecord(zoneName, fqdn string) (*TXTRecord, error) {
+// FindTxtRecord returns the TXT record at fqdn whose value matches value.
+func (c *Client) FindTxtRecord(zoneName, fqdn, value string) (*TXTRecord, error) {
 	host := dns01.UnFqdn(strings.TrimSuffix(dns01.UnFqdn(fqdn), zoneName))
 
 	reqURL := *c.BaseURL
@@ -144,7 +144,7 @@ func (c *Client) FindTxtRecord(zoneName, fqdn string) (*TXTRecord, error) {
 	}
 
 	for _, record := range records {
-		if record.Host == host && record.Type == "TXT" {
+		if record.Host == host && record.Type == "TXT" && record.Record == value {
 			return &record, nil
 		}
 	}

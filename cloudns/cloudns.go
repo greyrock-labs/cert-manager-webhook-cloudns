@@ -96,7 +96,7 @@ func (d *DNSProvider) CleanUp(fqdn, keyAuth string) error {
 		return fmt.Errorf("ClouDNS: %v", err)
 	}
 
-	record, err := d.client.FindTxtRecord(zone.Name, fqdn)
+	record, err := d.client.FindTxtRecord(zone.Name, fqdn, keyAuth)
 	if err != nil {
 		return fmt.Errorf("ClouDNS: %v", err)
 	}
