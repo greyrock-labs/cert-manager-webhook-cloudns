@@ -37,6 +37,11 @@ jobs:
         uses: https://github.com/docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f # v5.8.0
         with:
           images: ghcr.io/greyrock-labs/cert-manager-webhook-cloudns
+          # Must be the GitHub URL, not the Forgejo one -- this is what links
+          # the package to the repo. metadata-action would otherwise derive it
+          # from the Forgejo server URL, which GHCR cannot resolve.
+          labels: |
+            org.opencontainers.image.source=https://github.com/greyrock-labs/cert-manager-webhook-cloudns
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}

@@ -14,9 +14,6 @@ group "default" {
 
 target "image" {
   inherits = ["docker-metadata-action"]
-  labels = {
-    "org.opencontainers.image.source" = "https://github.com/greyrock-labs/cert-manager-webhook-cloudns"
-  }
 }
 
 target "image-local" {
@@ -26,9 +23,9 @@ target "image-local" {
 
 target "image-all" {
   inherits = ["image"]
-  // amd64 only: the cluster is single-arch, and the Forgejo runner cannot
-  // mount binfmt_misc, so QEMU emulation is unavailable. Restoring arm64
-  // means cross-compiling in the Dockerfile via TARGETARCH, not emulation.
+  // amd64 is the only architecture we target, by choice. The Forgejo runner
+  // also cannot mount binfmt_misc, so QEMU emulation is unavailable there
+  // regardless -- do not add docker/setup-qemu-action back.
   platforms = [
     "linux/amd64"
   ]

@@ -1,6 +1,8 @@
 apiVersion: v2
 name: cert-manager-webhook-cloudns
 description: A cert-manager DNS01 webhook solver for ClouDNS
+sources:
+  - https://github.com/greyrock-labs/cert-manager-webhook-cloudns
 type: application
 version: 2.0.0
 appVersion: "2.0.0"
