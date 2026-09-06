@@ -14,6 +14,12 @@ group "default" {
 
 target "image" {
   inherits = ["docker-metadata-action"]
+  // GHCR links a package to its repo from the manifest ANNOTATION, not the
+  // config label -- the label alone leaves the package orphaned. "index,manifest"
+  // puts it on both the index and each platform manifest.
+  annotations = [
+    "index,manifest:org.opencontainers.image.source=https://github.com/greyrock-labs/cert-manager-webhook-cloudns"
+  ]
 }
 
 target "image-local" {
