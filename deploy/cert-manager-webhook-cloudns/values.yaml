@@ -14,7 +14,9 @@ certManager:
 
 image:
   repository: ghcr.io/greyrock-labs/cert-manager-webhook-cloudns
-  tag: 2.0.0
+  # empty: defaults to .Chart.AppVersion, which helm package sets from the git
+  # tag at release time. Keeps chart and image versions from drifting apart.
+  tag: ""
   pullPolicy: IfNotPresent
 
 nameOverride: ""
