@@ -3,4 +3,19 @@
   extends: [
     "local>todd/renovate-config"
   ],
+  packageRules: [
+    {
+      // The Kubernetes libraries only compile as a matched set. k8s.io/apiserver
+      // is an indirect dependency, and Renovate skips indirect Go dependencies by
+      // default, so the stock monorepo group bumps client-go/api/apimachinery and
+      // leaves apiserver behind -- which does not build. Enable the indirect ones
+      // and group them all so they move together.
+      description: "Kubernetes libraries must be updated as a set",
+      matchManagers: ["gomod"],
+      matchPackageNames: ["k8s.io/**"],
+      matchDepTypes: ["require", "indirect"],
+      enabled: true,
+      groupName: "kubernetes packages"
+    }
+  ]
 }

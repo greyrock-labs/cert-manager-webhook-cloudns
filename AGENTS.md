@@ -91,6 +91,14 @@ Keep the cert-manager library aligned with the cert-manager actually running in
 the cluster. Raising it may raise `go.mod`'s `go` directive, and the Dockerfile's
 `golang:` base must move with it or the image build fails.
 
+The `k8s.io/*` libraries only compile as a matched set, and `k8s.io/apiserver` is
+an *indirect* dependency. Renovate skips indirect Go dependencies by default, so
+its stock kubernetes monorepo group bumps `client-go`, `api` and `apimachinery`
+while leaving `apiserver` behind — which fails to build with `cannot use
+o.options ([]string) as map[string]bool`. `.renovaterc.json5` carries a rule that
+enables the indirect ones and groups them, so they should now arrive together;
+check that a kubernetes PR really moves `apiserver` too before merging it.
+
 lego v4 is frozen — no release since v5.0.0 in May 2026, so it gets no security
 fixes. We are on v5. Three things moved in v5 and will bite anyone reading old
 examples:
