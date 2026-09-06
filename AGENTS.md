@@ -99,6 +99,12 @@ o.options ([]string) as map[string]bool`. `.renovaterc.json5` carries a rule tha
 enables the indirect ones and groups them, so they should now arrive together;
 check that a kubernetes PR really moves `apiserver` too before merging it.
 
+`.renovaterc.json5` also **holds `k8s.io/kube-openapi`**. Its newer
+pseudo-versions pull `sigs.k8s.io/structured-merge-diff/v7` while `apimachinery`
+still expects v6, which fails to compile. That hold is temporary — when the
+Kubernetes libraries next take a minor, try removing it and see whether the build
+is clean. It should not be carried indefinitely.
+
 lego v4 is frozen — no release since v5.0.0 in May 2026, so it gets no security
 fixes. We are on v5. Three things moved in v5 and will bite anyone reading old
 examples:

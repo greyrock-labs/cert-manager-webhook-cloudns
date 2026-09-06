@@ -16,6 +16,17 @@
       matchDepTypes: ["require", "indirect"],
       enabled: true,
       groupName: "kubernetes packages"
+    },
+    {
+      // kube-openapi's newer pseudo-versions pull sigs.k8s.io/structured-merge-diff/v7
+      // while k8s.io/apimachinery still expects v6, and the mismatch does not compile:
+      //   cannot use typeSchema.Types ([]v7/schema.TypeDef) as []v6/schema.TypeDef
+      // Held until apimachinery moves to v7. REVIEW THIS when the Kubernetes
+      // libraries next take a minor -- it should be removed, not carried forever.
+      description: "Hold kube-openapi until apimachinery moves to structured-merge-diff v7",
+      matchManagers: ["gomod"],
+      matchPackageNames: ["k8s.io/kube-openapi"],
+      enabled: false
     }
   ]
 }
