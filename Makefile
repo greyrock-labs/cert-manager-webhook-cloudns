@@ -1,5 +1,5 @@
-IMAGE_NAME := "mschirrmeister/cert-manager-webhook-cloudns"
-IMAGE_TAG := "1.1.1"
+IMAGE_NAME := "ghcr.io/greyrock-labs/cert-manager-webhook-cloudns"
+IMAGE_TAG := "local"
 
 OUT := $(shell pwd)/.out
 
