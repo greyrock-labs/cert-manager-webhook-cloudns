@@ -41,7 +41,7 @@ jobs:
 
       - name: Generate image tags and labels
         id: meta
-        uses: https://github.com/docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
+        uses: https://github.com/docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
           images: ghcr.io/greyrock-labs/cert-manager-webhook-cloudns
           # Must be the GitHub URL, not the Forgejo one -- this is what links
@@ -65,7 +65,7 @@ jobs:
           push: true
 
       - name: Set up Helm
-        uses: https://github.com/azure/setup-helm@1a275c3b69536ee54be43f2070a358922e12c8d4 # v4.3.1
+        uses: https://github.com/azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
 
       - name: Package and push chart
         env:
