@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -10,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/go-acme/lego/v4/challenge/dns01"
+	"github.com/go-acme/lego/v5/challenge/dns01"
 )
 
 const defaultBaseURL = "https://api.cloudns.net/dns/"
@@ -76,7 +77,7 @@ type Client struct {
 
 // GetZone Get domain name information for a FQDN
 func (c *Client) GetZone(authFQDN string) (*Zone, error) {
-	authZone, err := dns01.FindZoneByFqdn(authFQDN)
+	authZone, err := dns01.DefaultClient().FindZoneByFqdn(context.Background(), authFQDN)
 	if err != nil {
 		return nil, err
 	}

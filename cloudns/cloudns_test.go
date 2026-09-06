@@ -1,18 +1,52 @@
 package cloudns
 
 import (
+	"os"
 	"testing"
 	"time"
 
-	"github.com/go-acme/lego/v4/platform/tester"
 	"github.com/stretchr/testify/require"
 )
 
-var envTest = tester.NewEnvTest(
+// lego v5 made its platform/tester helper internal, so the small amount of it
+// this file used is reimplemented here on top of t.Setenv.
+
+var providerEnvVars = []string{
 	"CLOUDNS_AUTH_ID",
 	"CLOUDNS_AUTH_ID_TYPE",
-	"CLOUDNS_AUTH_PASSWORD").
-	WithDomain("CLOUDNS_DOMAIN")
+	"CLOUDNS_AUTH_PASSWORD",
+}
+
+const domainEnvVar = "CLOUDNS_DOMAIN"
+
+// liveEnv is the environment as it stood before any test touched it. The live
+// tests read it directly and are skipped unless every variable is populated.
+var liveEnv = func() map[string]string {
+	env := make(map[string]string, len(providerEnvVars)+1)
+	for _, name := range append(providerEnvVars, domainEnvVar) {
+		env[name] = os.Getenv(name)
+	}
+	return env
+}()
+
+func isLiveTest() bool {
+	for _, name := range append(providerEnvVars, domainEnvVar) {
+		if liveEnv[name] == "" {
+			return false
+		}
+	}
+	return true
+}
+
+// applyEnv clears every provider variable, then applies the given ones. An
+// empty value is equivalent to unset as far as lego's env package is
+// concerned, and t.Setenv restores the previous values when the test ends.
+func applyEnv(t *testing.T, vars map[string]string) {
+	t.Helper()
+	for _, name := range providerEnvVars {
+		t.Setenv(name, vars[name])
+	}
+}
 
 func TestNewDNSProvider(t *testing.T) {
 	testCases := []struct {
@@ -80,10 +114,7 @@ func TestNewDNSProvider(t *testing.T) {
 
 	for _, test := range testCases {
 		t.Run(test.desc, func(t *testing.T) {
-			defer envTest.RestoreEnv()
-			envTest.ClearEnv()
-
-			envTest.Apply(test.envVars)
+			applyEnv(t, test.envVars)
 
 			p, err := NewDNSProvider()
 
@@ -148,29 +179,27 @@ func TestNewDNSProviderConfig(t *testing.T) {
 }
 
 func TestLivePresent(t *testing.T) {
-	if !envTest.IsLiveTest() {
+	if !isLiveTest() {
 		t.Skip("skipping live test")
 	}
 
-	envTest.RestoreEnv()
 	provider, err := NewDNSProvider()
 	require.NoError(t, err)
 
-	err = provider.Present(envTest.GetDomain(), "123d==")
+	err = provider.Present(liveEnv[domainEnvVar], "123d==")
 	require.NoError(t, err)
 }
 
 func TestLiveCleanUp(t *testing.T) {
-	if !envTest.IsLiveTest() {
+	if !isLiveTest() {
 		t.Skip("skipping live test")
 	}
 
-	envTest.RestoreEnv()
 	provider, err := NewDNSProvider()
 	require.NoError(t, err)
 
 	time.Sleep(2 * time.Second)
 
-	err = provider.CleanUp(envTest.GetDomain(), "123d==")
+	err = provider.CleanUp(liveEnv[domainEnvVar], "123d==")
 	require.NoError(t, err)
 }
