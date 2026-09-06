@@ -14,6 +14,9 @@ group "default" {
 
 target "image" {
   inherits = ["docker-metadata-action"]
+  labels = {
+    "org.opencontainers.image.source" = "https://github.com/greyrock-labs/cert-manager-webhook-cloudns"
+  }
 }
 
 target "image-local" {
