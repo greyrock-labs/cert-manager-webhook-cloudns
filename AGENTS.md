@@ -6,7 +6,7 @@ to merge from and no rebase burden.
 
 Forgejo (`git.greyrock.io/todd/cert-manager-webhook-cloudns`) is the only git
 remote. GitHub is reached through a server-side push mirror — never add a GitHub
-remote. The branch is `master`, inherited from upstream and deliberately kept.
+remote. The default branch is `main`.
 
 ## Releasing
 
