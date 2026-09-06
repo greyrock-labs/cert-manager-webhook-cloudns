@@ -66,6 +66,7 @@ spec:
         - name: creds
           secret:
             secretName: {{ .Values.secretName }}
+            optional: true
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
