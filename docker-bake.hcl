@@ -26,8 +26,10 @@ target "image-local" {
 
 target "image-all" {
   inherits = ["image"]
+  // amd64 only: the cluster is single-arch, and the Forgejo runner cannot
+  // mount binfmt_misc, so QEMU emulation is unavailable. Restoring arm64
+  // means cross-compiling in the Dockerfile via TARGETARCH, not emulation.
   platforms = [
-    "linux/amd64",
-    "linux/arm64"
+    "linux/amd64"
   ]
 }
