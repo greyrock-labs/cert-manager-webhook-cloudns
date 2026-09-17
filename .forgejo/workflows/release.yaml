@@ -19,6 +19,41 @@ jobs:
         id: version
         run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
 
+      - name: Check the chart version is still the placeholder
+        # Chart.yaml's version is deliberately not maintained -- helm package
+        # below overrides it with --version/--app-version from the tag, so the
+        # file's own value never reaches a published chart. It is pinned to
+        # 0.0.0 so that a `helm template` from a checkout renders an
+        # unpullable image tag and fails loudly, rather than silently
+        # deploying whatever release the number last happened to match.
+        # If someone writes a real version in, that guarantee is gone -- so
+        # stop here, before anything expensive runs.
+        env:
+          PLACEHOLDER: 0.0.0
+          CHART: deploy/cert-manager-webhook-cloudns/Chart.yaml
+        run: |
+          version=$(awk '/^version:/ { print $2 }' "${CHART}" | tr -d '"')
+          app_version=$(awk '/^appVersion:/ { print $2 }' "${CHART}" | tr -d '"')
+
+          rc=0
+          if [ "${version}" != "${PLACEHOLDER}" ]; then
+            echo "${CHART}: version is '${version}', expected the placeholder '${PLACEHOLDER}'"
+            rc=1
+          fi
+          if [ "${app_version}" != "${PLACEHOLDER}" ]; then
+            echo "${CHART}: appVersion is '${app_version}', expected the placeholder '${PLACEHOLDER}'"
+            rc=1
+          fi
+
+          if [ "${rc}" -ne 0 ]; then
+            echo
+            echo "The git tag is the only version input; do not hand-edit Chart.yaml"
+            echo "to cut a release. Reset both fields to ${PLACEHOLDER} and tag instead."
+            exit 1
+          fi
+
+          echo "${CHART}: version and appVersion are both ${PLACEHOLDER}"
+
       - name: Set up Go
         uses: https://github.com/actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:

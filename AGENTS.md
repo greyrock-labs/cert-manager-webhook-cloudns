@@ -17,7 +17,18 @@ which tests, builds the image, packages the chart, and pushes both to GHCR.
 `--version` and `--app-version` derived from it, and `image.tag` defaults to
 `.Chart.AppVersion`, so the chart and the image it deploys cannot drift apart.
 Do not hand-edit the version in `Chart.yaml` to cut a release — tag instead.
-`Chart.yaml`'s version is a floor, not the authority.
+
+`Chart.yaml` pins `version` and `appVersion` to `0.0.0`, and that is deliberate.
+The file's own value never reaches a published chart, so any real number written
+there is unmaintained the moment the next tag lands — and a plausible stale
+version is worse than an obviously fake one, because it invites belief. It was
+`2.0.0` for nine releases, through `v2.4.0`, and nothing surfaced it. The
+placeholder also fails safe locally: since `image.tag` defaults to
+`.Chart.AppVersion`, a `helm template` from a checkout renders `:0.0.0`, which
+cannot be pulled, instead of quietly deploying a real but long-superseded image.
+
+A release step checks both fields are still `0.0.0` and fails before anything
+expensive runs, so this cannot rot back.
 
 ### Every release gets notes
 
